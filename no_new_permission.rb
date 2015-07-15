@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'json'
+
 module NoNewPermission
   class Permission
     attr_reader :name
@@ -14,6 +16,19 @@ module NoNewPermission
     
     def <=>(anOther)
       @name <=> anOther.name
+    end
+    
+    def to_json(*args)
+      {
+        'json_class' => self.class.name,
+        'data' => [@name]
+      }.to_json(*args)
+    end
+    
+    class << self
+      def json_create(object)
+        new(*object['data'])
+      end
     end
   end
   
