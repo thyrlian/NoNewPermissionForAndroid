@@ -77,12 +77,24 @@ module NoNewPermission
         end
         puts "Total: #{permissions.size}"
       end
+    end
+  end
+  
+  class Serializer
+    @@snapshot_file = 'permissions_snapshot.json'
+    
+    class << self
+      def parse
+        File.open(@@snapshot_file, 'r') do |file|
+          JSON.load(file)
+        end
+      end
       
-      def take_snapshot
-        
+      def generate(permissions)
+        File.open(@@snapshot_file, 'w') do |file|
+          file.puts(permissions.to_json)
+        end
       end
     end
-    
-    private_class_method :get_permissions
   end
 end
