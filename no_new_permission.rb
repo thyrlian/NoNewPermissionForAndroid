@@ -10,8 +10,12 @@ module NoNewPermission
       @name = name
     end
     
-    def ==(o)
-      self.class == o.class && @name == o.name
+    def eql?(other)
+      self.class == other.class && @name == other.name
+    end
+    
+    def hash
+      @name.hash ^ self.class.hash
     end
     
     def <=>(anOther)
@@ -92,6 +96,23 @@ module NoNewPermission
           file.puts(permissions.to_json)
         end
       end
+    end
+  end
+  
+  class Comparator
+    attr_reader :old_permissions, :new_permissions
+    
+    def initialize(old_permissions, new_permissions)
+      @old_permissions = old_permissions
+      @new_permissions = new_permissions
+    end
+    
+    def get_less
+      @old_permissions - @new_permissions
+    end
+    
+    def get_more
+      @new_permissions - @old_permissions
     end
   end
   
