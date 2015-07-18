@@ -32,69 +32,83 @@ module NoNewPermission
     end
   end
   
-  class Reader
-    class << self
-      def synthesize_command
-        android_build_tools_path = ARGV[0]
-        apk_file = ARGV[1]
-        "#{android_build_tools_path}/aapt d permissions #{apk_file}"
-      end
-      
-      def parse_output(&blk)
-        regex_permission = /(uses-)?permission:\s.*?(([^'\s\.]+\.)+[^'\s\.]+)/
-        begin
-          output = IO.popen(synthesize_command)
-          output.each_line do |line|
-            regex_permission.match(line)
-            if $~
-              blk.call(Permission.new($~[2]))
-            end
+  class Detector
+    attr_reader :android_build_tools_path, :apk_file
+    
+    def initialize(android_build_tools_path, apk_file)
+      @android_build_tools_path = android_build_tools_path
+      @apk_file = apk_file
+    end
+    
+    def synthesize_command
+      "#{@android_build_tools_path}/aapt d permissions #{@apk_file}"
+    end
+    
+    def parse_raw_permissions(&blk)
+      regex_permission = /(uses-)?permission:\s.*?(([^'\s\.]+\.)+[^'\s\.]+)/
+      begin
+        output = IO.popen(synthesize_command)
+        output.each_line do |line|
+          regex_permission.match(line)
+          if $~
+            blk.call(Permission.new($~[2]))
           end
-        rescue Exception => e
-          puts e.message
-          puts e.backtrace
         end
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace
       end
     end
     
-    private_class_method :synthesize_command
-  end
-  
-  class Monitor
-    class << self
-      def get_permissions
-        permissions = []
-        Reader.parse_output do |permission|
-          permissions.push(permission) unless permissions.include?(permission)
-        end
-        permissions
+    def get_permissions
+      permissions = []
+      parse_raw_permissions do |permission|
+        permissions.push(permission) unless permissions.include?(permission)
       end
-      
-      def list_permissions
-        permissions = get_permissions
-        permissions.sort.each do |permission|
-          puts permission.name
-        end
-        puts "Total: #{permissions.size}"
-      end
+      permissions
     end
+    
+    def list_permissions
+      permissions = get_permissions
+      permissions.sort.each do |permission|
+        puts permission.name
+      end
+      puts "Total: #{permissions.size}"
+    end
+    
+    private :synthesize_command, :parse_raw_permissions
   end
   
   class Serializer
-    @@snapshot_file = 'permissions_snapshot.json'
-    
     class << self
-      def parse
-        File.open(@@snapshot_file, 'r') do |file|
+      def parse(snapshot_file)
+        File.open(snapshot_file, 'r') do |file|
           JSON.load(file)
         end
       end
       
-      def generate(permissions)
-        File.open(@@snapshot_file, 'w') do |file|
+      def generate(permissions, snapshot_file)
+        File.open(snapshot_file, 'w') do |file|
           file.puts(permissions.to_json)
         end
       end
     end
   end
+  
+  class Main
+    class << self
+      def run
+        android_build_tools_path = ARGV[0]
+        apk_file = ARGV[1]
+        snapshot_file = 'permissions_snapshot.json'
+        detector = Detector.new(android_build_tools_path, apk_file)
+        Serializer.generate(detector.get_permissions, snapshot_file)
+        Serializer.parse(snapshot_file).each do |permission|
+          puts permission.name
+        end
+      end
+    end
+  end
 end
+
+NoNewPermission::Main.run
