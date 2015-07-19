@@ -36,13 +36,13 @@ module NoNewPermission
     def to_json(*args)
       {
         'json_class' => self.class.name,
-        'data' => [@name]
+        'data' => @name
       }.to_json(*args)
     end
     
     class << self
       def json_create(object)
-        new(*object['data'])
+        new(object['data'])
       end
     end
   end
@@ -100,14 +100,6 @@ module NoNewPermission
         permissions.push(permission) unless permissions.include?(permission)
       end
       permissions
-    end
-    
-    def list_permissions
-      permissions = get_permissions
-      permissions.sort.each do |permission|
-        puts permission.name
-      end
-      puts "Total: #{permissions.size}"
     end
     
     private :synthesize_command, :parse_raw_permissions
@@ -171,9 +163,10 @@ module NoNewPermission
   
   class Handler
     class << self
-      def deal(result, action_fail, action_attention)
+      def deal(result, action_pass, action_fail, action_attention)
         case result.first
         when PASS
+          action_pass.call unless action_pass.nil?
           exit 0
         when FAIL
           action_fail.call(result[1], result[2])
@@ -187,19 +180,63 @@ module NoNewPermission
   end
   
   class Main
-    class << self
-      def run
-        android_build_tools_path = ARGV[0]
-        apk_file = ARGV[1]
-        snapshot_file = "#{File.expand_path(File.dirname(__FILE__))}/permissions_snapshot.json"
-        detector = Detector.new(android_build_tools_path, apk_file)
-        Serializer.generate(detector.get_permissions, snapshot_file)
-        Serializer.parse(snapshot_file).each do |permission|
-          puts permission.name
-        end
+    attr_reader :android_build_tools_path, :apk_file, :snapshot_file, :permissions
+    
+    def initialize
+      @android_build_tools_path = ARGV[0]
+      @apk_file = ARGV[1]
+      @snapshot_file = "#{File.expand_path(File.dirname(__FILE__))}/permissions_snapshot.json"
+      @permissions = Detector.new(android_build_tools_path, apk_file).get_permissions
+    end
+    
+    def take_snapshot
+      if File.exists?(@snapshot_file)
+        message = 'Snapshot file has been updated.'
+      else
+        message = 'Snapshot file has been generated.'
       end
+      Serializer.generate(@permissions, @snapshot_file)
+      puts message
+    end
+    
+    def run
+      comparator = Comparator.new(Serializer.parse(@snapshot_file), @permissions)
+      result = Inspector.check(comparator)
+      Handler.deal(
+        result,
+        Proc.new do
+          puts DELIMITER
+          puts 'No permission is changed.'
+          puts DELIMITER
+        end,
+        Proc.new do |more, less|
+          puts DELIMITER
+          puts "#{more.size} new #{more.size == 1 ? 'permission' : 'permissions'} added:"
+          more.each do |permission|
+            puts "#{"\s" * 4}#{permission.name}"
+          end
+          unless less.empty?
+            puts ''
+            puts "#{less.size} old #{less.size == 1 ? 'permission' : 'permissions'} removed:"
+            less.each do |permission|
+              puts "#{"\s" * 4}#{permission.name}"
+            end
+          end
+          puts DELIMITER
+        end,
+        Proc.new do |less|
+          puts DELIMITER
+          puts "Brilliant!  You got #{less.size} #{less.size == 1 ? 'permission' : 'permissions'} removed:"
+          less.each do |permission|
+            puts "#{"\s" * 4}#{permission.name}"
+          end
+          puts ''
+          take_snapshot
+          puts DELIMITER
+        end
+      )
     end
   end
 end
 
-NoNewPermission::Main.run
+NoNewPermission::Main.new.run
