@@ -9,7 +9,7 @@ module NoNewPermission
   PASS_WITH_ATTENTION = 2
   
   DELIMITER = '=' * 70
-      
+  
   class Permission
     attr_reader :name
     
