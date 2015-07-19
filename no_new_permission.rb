@@ -182,11 +182,11 @@ module NoNewPermission
   class Main
     attr_reader :android_build_tools_path, :apk_file, :snapshot_file, :permissions
     
-    def initialize
-      @android_build_tools_path = ARGV[0]
-      @apk_file = ARGV[1]
+    def initialize(android_build_tools_path, apk_file)
+      @android_build_tools_path = android_build_tools_path
+      @apk_file = apk_file
       @snapshot_file = "#{File.expand_path(File.dirname(__FILE__))}/permissions_snapshot.json"
-      @permissions = Detector.new(android_build_tools_path, apk_file).get_permissions
+      @permissions = Detector.new(@android_build_tools_path, @apk_file).get_permissions
     end
     
     def take_snapshot
