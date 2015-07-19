@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'json'
+require 'open3'
 
 module NoNewPermission
   PASS                = 0
@@ -61,16 +62,35 @@ module NoNewPermission
     def parse_raw_permissions(&blk)
       regex_permission = /(uses-)?permission:\s.*?(([^'\s\.]+\.)+[^'\s\.]+)/
       begin
-        output = IO.popen(synthesize_command)
-        output.each_line do |line|
+        stdin, stdout, stderr, wait_thr = Open3.popen3(synthesize_command)
+        stdout.each_line do |line|
           regex_permission.match(line)
           if $~
             blk.call(Permission.new($~[2]))
           end
         end
       rescue Exception => e
+        puts DELIMITER
         puts e.message
         puts e.backtrace
+        puts DELIMITER
+        exit 1
+      ensure
+        exit_status = wait_thr.value
+        unless exit_status.success?
+          puts DELIMITER
+          if exit_status.signaled?
+            termsig = exit_status.termsig || "Null"
+            puts "Terminated because of an uncaught signal: #{termsig}"
+          else
+            stderr.each_line do |line|
+              puts line
+            end
+          end
+          puts DELIMITER
+          [stdin, stdout, stderr].each {|io| io.close}
+          exit 1
+        end
       end
     end
     
@@ -104,6 +124,7 @@ module NoNewPermission
           puts DELIMITER
           puts 'Snapshot file does not exist, please generate one manually.'
           puts DELIMITER
+          exit 1
         end
       end
       
