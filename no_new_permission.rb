@@ -6,6 +6,8 @@ module NoNewPermission
   PASS                = 0
   FAIL                = 1
   PASS_WITH_ATTENTION = 2
+  
+  DELIMITER = '=' * 70
       
   class Permission
     attr_reader :name
@@ -94,8 +96,14 @@ module NoNewPermission
   class Serializer
     class << self
       def parse(snapshot_file)
-        File.open(snapshot_file, 'r') do |file|
-          JSON.load(file)
+        begin
+          File.open(snapshot_file, 'r') do |file|
+            JSON.load(file)
+          end
+        rescue Errno::ENOENT => e
+          puts DELIMITER
+          puts 'Snapshot file does not exist, please generate one manually.'
+          puts DELIMITER
         end
       end
       
