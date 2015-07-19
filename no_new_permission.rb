@@ -238,5 +238,3 @@ module NoNewPermission
     end
   end
 end
-
-NoNewPermission::Main.new.run
