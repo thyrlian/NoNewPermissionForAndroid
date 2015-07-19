@@ -69,13 +69,6 @@ module NoNewPermission
             blk.call(Permission.new($~[2]))
           end
         end
-      rescue Exception => e
-        puts DELIMITER
-        puts e.message
-        puts e.backtrace
-        puts DELIMITER
-        exit 1
-      ensure
         exit_status = wait_thr.value
         unless exit_status.success?
           puts DELIMITER
@@ -88,9 +81,15 @@ module NoNewPermission
             end
           end
           puts DELIMITER
-          [stdin, stdout, stderr].each {|io| io.close}
+          [stdin, stdout, stderr].each {|io| io.close unless io.nil? }
           exit 1
         end
+      rescue Errno::ENOENT => e
+        puts DELIMITER
+        puts e.message
+        puts DELIMITER
+        [stdin, stdout, stderr].each {|io| io.close unless io.nil? }
+        exit 1
       end
     end
     
