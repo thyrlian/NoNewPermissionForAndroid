@@ -53,7 +53,7 @@ module NoNewPermission
     end
     
     def synthesize_command
-      "#{@android_build_tools_path}/aapt d permissions #{@apk_file}"
+      "#{@android_build_tools_path.gsub(/\/$/, '')}/aapt d permissions #{@apk_file}"
     end
     
     def parse_raw_permissions(&blk)
