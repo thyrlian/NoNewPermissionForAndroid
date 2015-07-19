@@ -3,6 +3,10 @@
 require 'json'
 
 module NoNewPermission
+  PASS                = 0
+  FAIL                = 1
+  PASS_WITH_ATTENTION = 2
+      
   class Permission
     attr_reader :name
     
@@ -18,8 +22,12 @@ module NoNewPermission
       @name.hash ^ self.class.hash
     end
     
-    def <=>(anOther)
-      @name <=> anOther.name
+    def ==(other)
+      eql?(other)
+    end
+    
+    def <=>(other)
+      @name <=> other.name
     end
     
     def to_json(*args)
@@ -116,12 +124,45 @@ module NoNewPermission
     end
   end
   
+  class Inspector
+    class << self
+      def check(comparator)
+        more = comparator.get_more
+        less = comparator.get_less
+        if more.size > 0
+          return [FAIL, more, less]
+        elsif less.size > 0
+          return [PASS_WITH_ATTENTION, [], less]
+        else
+          return [PASS, [], []]
+        end
+      end
+    end
+  end
+  
+  class Handler
+    class << self
+      def deal(result, action_fail, action_attention)
+        case result.first
+        when PASS
+          exit 0
+        when FAIL
+          action_fail.call(result[1], result[2])
+          exit 1
+        when PASS_WITH_ATTENTION
+          action_attention.call(result[2])
+          exit 0
+        end
+      end
+    end
+  end
+  
   class Main
     class << self
       def run
         android_build_tools_path = ARGV[0]
         apk_file = ARGV[1]
-        snapshot_file = 'permissions_snapshot.json'
+        snapshot_file = "#{File.expand_path(File.dirname(__FILE__))}/permissions_snapshot.json"
         detector = Detector.new(android_build_tools_path, apk_file)
         Serializer.generate(detector.get_permissions, snapshot_file)
         Serializer.parse(snapshot_file).each do |permission|
