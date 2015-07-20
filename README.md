@@ -26,6 +26,57 @@ cd <DIRECTORY_OF_THIS_SCRIPT>
 rake examine[<ANDROID_SDK_PATH>/build-tools/<BUILD_TOOLS_REV>,<ANDROID_APK_PATH>]
 ```
 
+## Results
+There are 4 possible cases (++, --, ++&--, ==), and the results could look like the example output below:
+* permission++
+* => Failure (exit code 1)
+```
+======================================================================
+4 new permissions added:
+    android.permission.CAMERA
+    android.permission.FLASHLIGHT
+    android.permission.SEND_SMS
+    com.me.app.myapp.permission.DEADLY_ACTIVITY
+======================================================================
+```
+
+* permission++  &  permission--
+* => Failure (exit code 1)
+```
+======================================================================
+4 new permissions added:
+    android.permission.WRITE_EXTERNAL_STORAGE
+    com.sonyericsson.home.permission.BROADCAST_BADGE
+    com.sec.android.provider.badge.permission.READ
+    com.sec.android.provider.badge.permission.WRITE
+
+2 old permissions removed:
+    android.permission.CAMERA
+    android.permission.FLASHLIGHT
+======================================================================
+```
+
+* permission--
+* => Success (exit code 0)  & update snapshot automatically
+```
+======================================================================
+Brilliant!  You got 3 permissions removed:
+    android.permission.CAMERA
+    android.permission.FLASHLIGHT
+    com.me.app.myapp.permission.DEADLY_ACTIVITY
+
+Snapshot file has been updated.
+======================================================================
+```
+
+* permission==
+* => Success (exit code 0)
+```
+======================================================================
+No permission is changed.
+======================================================================
+```
+
 ## Note
 * Before running the regular CI job, you must generate a snapshot file first:
 ```
