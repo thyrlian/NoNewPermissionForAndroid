@@ -129,3 +129,6 @@ for (PermissionGroupInfo permissionGroupInfo : permissionGroup) {
 
 // => I/XXX﹕ Camera
 ```
+
+**One last thing**
+I also tried to write unit test with Robolectric to assert new permissions, but I did not use the latest version of Robolectric, thus ```Robolectric.buildActivity(XxxActivity.class).get()``` doesn't return the real complete activity.  As a result, this way doesn't show all permissions.
