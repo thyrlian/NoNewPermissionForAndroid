@@ -96,7 +96,7 @@ For example, in my project:
 * permissionGroup.size() => 32
 
 Code snippet
-* PackageInfo#requestedPermissions
+* **PackageInfo#requestedPermissions**
 ```java
 Context context = this.getApplicationContext();
 PackageManager pm = context.getPackageManager();
@@ -117,7 +117,7 @@ if (packageInfo != null) {
 // => I/XXX﹕ android.permission.CAMERA
 ```
 
-* PackageManager#getAllPermissionGroups(x)
+* **PackageManager#getAllPermissionGroups(x)**
 ```java
 Context context = this.getApplicationContext();
 PackageManager pm = context.getPackageManager();
