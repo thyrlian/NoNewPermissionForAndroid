@@ -18,6 +18,16 @@ rake take_snapshot[android_build_tools_path,apk_file]
     Generate the reference snapshot file, before the first run
 ```
 
+## Note
+* Before running the regular CI job, you must generate a snapshot file first:
+```
+rake take_snapshot[<ANDROID_SDK_PATH>/build-tools/<BUILD_TOOLS_REV>,<ANDROID_APK_PATH>]
+```
+* If you use zsh, you may encounter `no matches found`, then please try to add `\` before bracket, like below:
+```
+rake examine\[<ANDROID_SDK_PATH>/build-tools/<BUILD_TOOLS_REV>,<ANDROID_APK_PATH>\]
+```
+
 ## Jenkins Configure
 * **Build** -> **Execute shell** -> **Command**
 ```
@@ -75,14 +85,4 @@ Snapshot file has been updated.
 ======================================================================
 No permission is changed.
 ======================================================================
-```
-
-## Note
-* Before running the regular CI job, you must generate a snapshot file first:
-```
-rake take_snapshot[<ANDROID_SDK_PATH>/build-tools/<BUILD_TOOLS_REV>,<ANDROID_APK_PATH>]
-```
-* If you use zsh, you may encounter `no matches found`, then please try to add `\` before bracket, like below:
-```
-rake examine\[<ANDROID_SDK_PATH>/build-tools/<BUILD_TOOLS_REV>,<ANDROID_APK_PATH>\]
 ```
