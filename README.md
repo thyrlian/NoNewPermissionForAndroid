@@ -86,3 +86,42 @@ Snapshot file has been updated.
 No permission is changed.
 ======================================================================
 ```
+
+## Memorandum
+There are different ways of reading permissions from Android, and each one could lead to different results.  But reading from APK is the most reliable approach, it shows all permissions.
+
+For example, in my project:
+* uses-permission in AndroidManifest.xml (before merging) => 9
+* requestedPermissions.length => 19
+* permissionGroup.size() => 32
+
+Code snippet
+* PackageInfo#requestedPermissions
+```java
+Context context = this.getApplicationContext();
+PackageManager pm = context.getPackageManager();
+PackageInfo packageInfo = null;
+try {
+    packageInfo = pm.getPackageInfo("com.foo.bar", PackageManager.GET_PERMISSIONS);
+} catch (PackageManager.NameNotFoundException e) {
+    e.printStackTrace();
+}
+if (packageInfo != null) {
+    String[] requestedPermissions = packageInfo.requestedPermissions;
+    Log.i("XXX", String.valueOf(requestedPermissions.length));
+    for (String permission : requestedPermissions) {
+        Log.i("XXX", permission);
+    }
+}
+```
+
+* PackageManager#getAllPermissionGroups(x)
+```java
+Context context = this.getApplicationContext();
+PackageManager pm = context.getPackageManager();
+List<PermissionGroupInfo> permissionGroup = pm.getAllPermissionGroups(0);
+Log.i("XXX", String.valueOf(permissionGroup.size()));
+for (PermissionGroupInfo permissionGroupInfo : permissionGroup) {
+    Log.i("XXX", permissionGroupInfo.loadLabel(pm).toString());
+}
+```
