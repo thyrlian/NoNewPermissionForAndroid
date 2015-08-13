@@ -113,6 +113,8 @@ if (packageInfo != null) {
         Log.i("XXX", permission);
     }
 }
+
+// => I/XXX﹕ android.permission.CAMERA
 ```
 
 * PackageManager#getAllPermissionGroups(x)
@@ -124,4 +126,6 @@ Log.i("XXX", String.valueOf(permissionGroup.size()));
 for (PermissionGroupInfo permissionGroupInfo : permissionGroup) {
     Log.i("XXX", permissionGroupInfo.loadLabel(pm).toString());
 }
+
+// => I/XXX﹕ Camera
 ```
