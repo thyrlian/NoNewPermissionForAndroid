@@ -2,7 +2,7 @@
 
 [![Android Dev Digest](https://img.shields.io/badge/AndroidDevDigest-%23101-green.svg)](https://www.androiddevdigest.com/digest-101/)
 
-[Permission](https://developer.android.com/guide/topics/permissions/index.html) matters!  That's what the users care the most.  They hate every permission from the bottom of heart, especially the **newly added permission(s)**.  They are always suspicious of why on earth the app needs any of the permissions.  It would be better to check if you have added any new permission to your Android app by any means (e.g. the external library could bring some new permissions).
+[Permission](https://developer.android.com/guide/topics/permissions/index.html) matters!  That's what the users care the most.  Users are always suspicious of why on earth the app needs any of the permissions, they hate every permission from the bottom of heart.  It would be better to check if you have added any new permission to your Android app by any means (e.g. the external library could bring some new permissions).  Otherwise, the app new version's adoption rate would be affected.
 
 This script could help warn developers of any permission change by setting up a CI job.
 
