@@ -4,6 +4,10 @@
 
 **Note**: This project still works perfectly.  But since Android Studio 3.0, Google has introduced a new tool - [apkanalyzer](https://developer.android.com/studio/command-line/apkanalyzer.html), which provides a native solution to easily fetch permissions from apk file (`apkanalyzer manifest permissions <your_application>.apk`).  I'll create another project based on apkanalyzer.  Stay tuned...
 
+<a href="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%201.png" target="_blank"><img src="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%201.png" height="300"></a>
+<a href="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%202.png" target="_blank"><img src="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%202.png" height="300"></a>
+<a href="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%203.png" target="_blank"><img src="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%203.png" height="300"></a>
+
 [Permission](https://developer.android.com/guide/topics/permissions/index.html) matters!  That's what the users care the most.  Users are always suspicious of why on earth the app needs any of the permissions, they hate every permission from the bottom of heart.  It would be better to check if you have added any new permission to your Android app by any means (e.g. the external library could bring some new permissions).  Otherwise, the app new version's adoption rate would be affected.
 
 This script could help warn developers of any permission change by setting up a CI job.
