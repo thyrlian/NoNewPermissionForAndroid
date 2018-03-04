@@ -2,7 +2,7 @@
 
 [![Android Dev Digest](https://img.shields.io/badge/AndroidDevDigest-%23101-green.svg)](https://www.androiddevdigest.com/digest-101/)
 
-**Note**: This project still works perfectly.  But since Android Studio 3.0, Google has introduced a new tool - [apkanalyzer](https://developer.android.com/studio/command-line/apkanalyzer.html), which provides a native solution to easily fetch permissions from apk file (`apkanalyzer manifest permissions <your_application>.apk`).  I'll create another project based on apkanalyzer.  Stay tuned...
+**Note**: This project still works perfectly.  But since Android Studio 3.0, Google has introduced a new tool - [apkanalyzer](https://developer.android.com/studio/command-line/apkanalyzer.html), which provides a native solution to easily fetch permissions from apk file (`apkanalyzer manifest permissions <your_application>.apk`).  My new project based on apkanalyzer can be found [here](https://github.com/thyrlian/PermissionMatters).
 
 <a href="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%201.png" target="_blank"><img src="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%201.png" height="300"></a>
 <a href="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%202.png" target="_blank"><img src="https://github.com/thyrlian/NoNewPermissionForAndroid/blob/master/apkanalyzer%202.png" height="300"></a>
